@@ -1,63 +1,51 @@
 vim.pack.add({
-  -- "https://github.com/Mofiqul/dracula.nvim",
-  "https://github.com/catppuccin/nvim",
-  "https://github.com/mason-org/mason.nvim",
-  "https://github.com/mason-org/mason-lspconfig.nvim",
-  "https://github.com/neovim/nvim-lspconfig",
-  "https://github.com/owallb/mason-auto-install.nvim",
-  "https://github.com/rachartier/tiny-inline-diagnostic.nvim", -- diagnostic
-  "https://github.com/nvim-neo-tree/neo-tree.nvim",
-  "https://github.com/nvim-lua/plenary.nvim",
-  "https://github.com/MunifTanjim/nui.nvim",
-  "https://github.com/nvim-tree/nvim-web-devicons",
-  "https://github.com/nvimdev/dashboard-nvim",
-  "https://github.com/folke/which-key.nvim",
-  "https://github.com/nvim-lualine/lualine.nvim",
-  "https://github.com/akinsho/bufferline.nvim",
-  "https://github.com/lukas-reineke/indent-blankline.nvim",
-  "https://github.com/nvim-telescope/telescope.nvim",
-  "https://github.com/nvim-lua/plenary.nvim",
-  "https://github.com/folke/noice.nvim",
-  "https://github.com/MunifTanjim/nui.nvim",
-  "https://github.com/rcarriga/nvim-notify",
-  "https://github.com/saghen/blink.cmp",
-  "https://github.com/rafamadriz/friendly-snippets",
-  "https://github.com/folke/lazydev.nvim",
+  "https://github.com/nvim-mini/mini.nvim",
 })
 
--- ui
-vim.cmd("colorscheme catppuccin")
-vim.opt.number = true
-vim.opt.showtabline = 2
+vim.cmd.colorscheme("randomhue")
+require("mini.basics").setup()
+require("mini.pairs").setup()
+require("mini.cmdline").setup()
+require("mini.files").setup()
+require("mini.map").setup()
 
-require("tiny-inline-diagnostic").setup({})
-require("neo-tree").setup({})
-require("lualine").setup({})
-require("bufferline").setup({})
-require("ibl").setup()
-require("which-key").setup({})
-require("telescope").setup({})
-require("noice").setup({})
+require("mini.icons").setup()
+require("mini.statusline").setup()
+require("mini.tabline").setup()
+require("mini.indentscope").setup()
+require("mini.notify").setup()
+require("mini.starter").setup()
+
+require("mini.deps").setup()
+local add = MiniDeps.add
+
+add({
+  source = "folke/lazydev.nvim",
+})
 require("lazydev").setup({})
+
+add({
+  source = "neovim/nvim-lspconfig",
+  depends = { "williamboman/mason.nvim" },
+})
 require("mason").setup({})
-require("mason-lspconfig").setup({ automatic_enable = false })
+
+add({
+  source = "mason-org/mason-lspconfig.nvim",
+  depends = { "mason-org/mason.nvim", "neovim/nvim-lspconfig" },
+})
+require("mason-lspconfig").setup()
+
+add({
+  source = "saghen/blink.cmp",
+  depends = { "rafamadriz/friendly-snippets" },
+})
 require("blink.cmp").setup({
   keymap = { preset = "super-tab" },
   fuzzy = { implementation = "lua" },
 })
-require("mason-auto-install").setup({
-  packages = { "lua-language-server", "stylua", "gopls" },
-})
 
-vim.lsp.enable({ "lua_ls", "stylua", "gopls" })
-
--- events
-vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    require("dashboard").setup({})
-  end,
-})
-
+-- format
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
   callback = function()
@@ -65,16 +53,11 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
--- key
--- vim.keymap.set("n", ":", ":FineCmdline<Cr>", { silent = true })
-vim.keymap.set("n", "-", ":Neotree focus<Cr>", { silent = true, desc = "neotree" })
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { silent = true, desc = "format" })
-vim.keymap.set("n", "<leader>e", ":Neotree focus<Cr>", { silent = true, desc = "neotree" })
-vim.keymap.set("n", "<leader>qq", ":qa!<Cr>", { silent = true, desc = "exit force" })
-vim.keymap.set("n", "<leader>bd", ":bd<Cr>", { silent = true, desc = "close buf" })
-vim.keymap.set("n", "<leader>bD", ":bd!<Cr>", { silent = true, desc = "close buf force" })
-vim.keymap.set({ "i", "n" }, "<C-s>", "<cmd>:w<Cr>", { silent = true })
-vim.keymap.set({ "i", "n" }, "<C-q>", "<cmd>:q<Cr>", { silent = true })
-vim.keymap.set({ "i", "n" }, "<C-p>", "<cmd>:Telescope fd hidden=true<Cr>", { silent = true })
-vim.keymap.set({ "i", "n" }, "<A-Left>", "<cmd>:bnext<Cr>", { silent = true })
-vim.keymap.set({ "i", "n" }, "<A-Right>", "<cmd>:bprevious<Cr>", { silent = true })
+-- keys
+local minifiles_toggle = function(...)
+  if not MiniFiles.close() then
+    MiniFiles.open(...)
+  end
+end
+vim.keymap.set("n", "-", minifiles_toggle, {})
+vim.keymap.set("n", "_", MiniMap.toggle, {})
