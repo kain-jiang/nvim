@@ -23,6 +23,8 @@ vim.pack.add({
   "https://github.com/saghen/blink.cmp",
   "https://github.com/rafamadriz/friendly-snippets",
   "https://github.com/folke/lazydev.nvim",
+  "https://github.com/smoka7/hop.nvim",
+  "https://github.com/aznhe21/actions-preview.nvim",
 })
 
 -- ui
@@ -38,6 +40,9 @@ require("ibl").setup()
 require("which-key").setup({})
 require("telescope").setup({})
 require("noice").setup({})
+require("hop").setup({})
+
+-- lsp
 require("lazydev").setup({})
 require("mason").setup({})
 require("mason-lspconfig").setup({ automatic_enable = false })
@@ -57,7 +62,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
     require("dashboard").setup({})
   end,
 })
-
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
   callback = function()
@@ -65,16 +69,25 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
+-- functions
+local F = {
+  ca = require("actions-preview").code_actions,
+  fmt = vim.lsp.buf.format,
+}
+
 -- key
--- vim.keymap.set("n", ":", ":FineCmdline<Cr>", { silent = true })
 vim.keymap.set("n", "-", ":Neotree focus<Cr>", { silent = true, desc = "neotree" })
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, { silent = true, desc = "format" })
+vim.keymap.set({ "n", "x" }, "<leader>ca", F.ca, { silent = true, desc = "code action" })
+vim.keymap.set("n", "<leader>f", F.fmt, { silent = true, desc = "format" })
 vim.keymap.set("n", "<leader>e", ":Neotree focus<Cr>", { silent = true, desc = "neotree" })
 vim.keymap.set("n", "<leader>qq", ":qa!<Cr>", { silent = true, desc = "exit force" })
 vim.keymap.set("n", "<leader>bd", ":bd<Cr>", { silent = true, desc = "close buf" })
 vim.keymap.set("n", "<leader>bD", ":bd!<Cr>", { silent = true, desc = "close buf force" })
+vim.keymap.set("n", "<leader><leader>", ":HopWord<Cr>", { silent = true, desc = "hop word" })
 vim.keymap.set({ "i", "n" }, "<C-s>", "<cmd>:w<Cr>", { silent = true })
 vim.keymap.set({ "i", "n" }, "<C-q>", "<cmd>:q<Cr>", { silent = true })
 vim.keymap.set({ "i", "n" }, "<C-p>", "<cmd>:Telescope fd hidden=true<Cr>", { silent = true })
 vim.keymap.set({ "i", "n" }, "<A-Left>", "<cmd>:bnext<Cr>", { silent = true })
 vim.keymap.set({ "i", "n" }, "<A-Right>", "<cmd>:bprevious<Cr>", { silent = true })
+
+a = { b = c }
